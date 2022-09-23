@@ -1,0 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+export enum ENUM_PERMISSION_STATUS_CODE_ERROR {
+	PERMISSION_NOT_FOUND_ERROR = 5200,
+	PERMISSION_GUARD_INVALID_ERROR = 5201,
+	PERMISSION_ACTIVE_ERROR = 5203,
+}
