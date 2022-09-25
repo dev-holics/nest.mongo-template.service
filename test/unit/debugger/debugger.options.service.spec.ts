@@ -3,38 +3,37 @@ import { CommonModule } from 'src/common/common.module';
 import { DebuggerOptionService } from 'src/common/debugger/services/debugger.options.service';
 
 describe('DebuggerOptionService', () => {
-    let debuggerOptionService: DebuggerOptionService;
+	let debuggerOptionService: DebuggerOptionService;
 
-    beforeEach(async () => {
-        const moduleRef = await Test.createTestingModule({
-            imports: [CommonModule],
-        }).compile();
+	beforeEach(async () => {
+		const moduleRef = await Test.createTestingModule({
+			imports: [CommonModule],
+		}).compile();
 
-        debuggerOptionService = moduleRef.get<DebuggerOptionService>(
-            DebuggerOptionService
-        );
-    });
+		debuggerOptionService = moduleRef.get<DebuggerOptionService>(
+			DebuggerOptionService,
+		);
+	});
 
-    it('should be defined', () => {
-        expect(debuggerOptionService).toBeDefined();
-    });
+	it('should be defined', () => {
+		expect(debuggerOptionService).toBeDefined();
+	});
 
-    describe('info', () => {
-        it('should be called', async () => {
-            const test = jest.spyOn(debuggerOptionService, 'createLogger');
+	describe('info', () => {
+		it('should be called', async () => {
+			const test = jest.spyOn(debuggerOptionService, 'createLogger');
 
-            debuggerOptionService.createLogger();
-            expect(test).toHaveBeenCalled();
-        });
+			debuggerOptionService.createLogger();
+			expect(test).toHaveBeenCalled();
+		});
 
-        it('should be success', async () => {
-            const options = debuggerOptionService.createLogger();
-            jest.spyOn(
-                debuggerOptionService,
-                'createLogger'
-            ).mockImplementation(() => options);
+		it('should be success', async () => {
+			const options = debuggerOptionService.createLogger();
+			jest
+				.spyOn(debuggerOptionService, 'createLogger')
+				.mockImplementation(() => options);
 
-            expect(debuggerOptionService.createLogger()).toBe(options);
-        });
-    });
+			expect(debuggerOptionService.createLogger()).toBe(options);
+		});
+	});
 });

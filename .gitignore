@@ -4,8 +4,6 @@
 
 # Env
 .env
-.env.docker
-.env.production
 
 # Logs
 logs

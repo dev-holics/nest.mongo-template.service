@@ -12,72 +12,72 @@ import { AuthService } from 'src/common/auth/services/auth.service';
 import { RoutesModule } from 'src/router/routes/routes.module';
 
 describe('E2E Auth', () => {
-    let app: INestApplication;
-    let helperDateService: HelperDateService;
-    let authApiService: AuthApiService;
-    let authService: AuthService;
+	let app: INestApplication;
+	let helperDateService: HelperDateService;
+	let authApiService: AuthApiService;
+	let authService: AuthService;
 
-    const apiKey = 'qwertyuiop12345zxcvbnmkjh';
-    let xApiKey: string;
-    let timestamp: number;
+	const apiKey = 'qwertyuiop12345zxcvbnmkjh';
+	let xApiKey: string;
+	let timestamp: number;
 
-    let accessToken: string;
+	let accessToken: string;
 
-    beforeAll(async () => {
-        const modRef = await Test.createTestingModule({
-            imports: [
-                CommonModule,
-                RoutesModule,
-                RouterModule.register([
-                    {
-                        path: '/',
-                        module: RoutesModule,
-                    },
-                ]),
-            ],
-        }).compile();
+	beforeAll(async () => {
+		const modRef = await Test.createTestingModule({
+			imports: [
+				CommonModule,
+				RoutesModule,
+				RouterModule.register([
+					{
+						path: '/',
+						module: RoutesModule,
+					},
+				]),
+			],
+		}).compile();
 
-        app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
-        helperDateService = app.get(HelperDateService);
-        authApiService = app.get(AuthApiService);
-        authService = app.get(AuthService);
+		app = modRef.createNestApplication();
+		useContainer(app.select(CommonModule), { fallbackOnErrors: true });
+		helperDateService = app.get(HelperDateService);
+		authApiService = app.get(AuthApiService);
+		authService = app.get(AuthService);
 
-        const payload = await authService.createPayloadAccessToken(
-            E2E_AUTH_PAYLOAD_TEST,
-            false
-        );
-        accessToken = await authService.createAccessToken(payload);
+		const payload = await authService.createPayloadAccessToken(
+			E2E_AUTH_PAYLOAD_TEST,
+			false,
+		);
+		accessToken = await authService.createAccessToken(payload);
 
-        timestamp = helperDateService.timestamp();
-        const apiEncryption = await authApiService.encryptApiKey(
-            {
-                key: apiKey,
-                timestamp,
+		timestamp = helperDateService.timestamp();
+		const apiEncryption = await authApiService.encryptApiKey(
+			{
+				key: apiKey,
+				timestamp,
 
-                hash: 'e11a023bc0ccf713cb50de9baa5140e59d3d4c52ec8952d9ca60326e040eda54',
-            },
-            'opbUwdiS1FBsrDUoPgZdx',
-            'cuwakimacojulawu'
-        );
-        xApiKey = `${apiKey}:${apiEncryption}`;
+				hash: 'e11a023bc0ccf713cb50de9baa5140e59d3d4c52ec8952d9ca60326e040eda54',
+			},
+			'opbUwdiS1FBsrDUoPgZdx',
+			'cuwakimacojulawu',
+		);
+		xApiKey = `${apiKey}:${apiEncryption}`;
 
-        await app.init();
-    });
+		await app.init();
+	});
 
-    it(`GET ${E2E_AUTH_INFO_URL} Success`, async () => {
-        const response = await request(app.getHttpServer())
-            .get(E2E_AUTH_INFO_URL)
-            .set('user-agent', faker.internet.userAgent())
-            .set('x-timestamp', timestamp.toString())
-            .set('Authorization', `Bearer ${accessToken}`)
-            .set('x-api-key', xApiKey);
+	it(`GET ${E2E_AUTH_INFO_URL} Success`, async () => {
+		const response = await request(app.getHttpServer())
+			.get(E2E_AUTH_INFO_URL)
+			.set('user-agent', faker.internet.userAgent())
+			.set('x-timestamp', timestamp.toString())
+			.set('Authorization', `Bearer ${accessToken}`)
+			.set('x-api-key', xApiKey);
 
-        expect(response.status).toEqual(HttpStatus.OK);
-        expect(response.body.statusCode).toEqual(HttpStatus.OK);
-    });
+		expect(response.status).toEqual(HttpStatus.OK);
+		expect(response.body.statusCode).toEqual(HttpStatus.OK);
+	});
 
-    afterAll(async () => {
-        await app.close();
-    });
+	afterAll(async () => {
+		await app.close();
+	});
 });

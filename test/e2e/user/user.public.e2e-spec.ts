@@ -15,164 +15,164 @@ import { ENUM_REQUEST_STATUS_CODE_ERROR } from 'src/common/request/constants/req
 import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/constants/user.status-code.constant';
 
 describe('E2E User Public', () => {
-    let app: INestApplication;
-    let userService: UserService;
-    let helperDateService: HelperDateService;
-    let authApiService: AuthApiService;
+	let app: INestApplication;
+	let userService: UserService;
+	let helperDateService: HelperDateService;
+	let authApiService: AuthApiService;
 
-    const password = `@!aaAA@123`;
+	const password = `@!aaAA@123`;
 
-    const apiKey = 'qwertyuiop12345zxcvbnmkjh';
-    let xApiKey: string;
-    let timestamp: number;
+	const apiKey = 'qwertyuiop12345zxcvbnmkjh';
+	let xApiKey: string;
+	let timestamp: number;
 
-    let userData: Record<string, any>;
+	let userData: Record<string, any>;
 
-    beforeAll(async () => {
-        const modRef = await Test.createTestingModule({
-            imports: [
-                CommonModule,
-                RoutesPublicModule,
-                RouterModule.register([
-                    {
-                        path: '/public',
-                        module: RoutesPublicModule,
-                    },
-                ]),
-            ],
-        }).compile();
+	beforeAll(async () => {
+		const modRef = await Test.createTestingModule({
+			imports: [
+				CommonModule,
+				RoutesPublicModule,
+				RouterModule.register([
+					{
+						path: '/public',
+						module: RoutesPublicModule,
+					},
+				]),
+			],
+		}).compile();
 
-        app = modRef.createNestApplication();
-        useContainer(app.select(CommonModule), { fallbackOnErrors: true });
-        userService = app.get(UserService);
-        helperDateService = app.get(HelperDateService);
-        authApiService = app.get(AuthApiService);
+		app = modRef.createNestApplication();
+		useContainer(app.select(CommonModule), { fallbackOnErrors: true });
+		userService = app.get(UserService);
+		helperDateService = app.get(HelperDateService);
+		authApiService = app.get(AuthApiService);
 
-        userData = {
-            firstName: faker.name.firstName(),
-            lastName: faker.name.lastName(),
-            password: password,
-            email: faker.internet.email(),
-            mobileNumber: faker.phone.number('62812#########'),
-        };
+		userData = {
+			firstName: faker.name.firstName(),
+			lastName: faker.name.lastName(),
+			password: password,
+			email: faker.internet.email(),
+			mobileNumber: faker.phone.number('62812#########'),
+		};
 
-        timestamp = helperDateService.timestamp();
-        const apiEncryption = await authApiService.encryptApiKey(
-            {
-                key: apiKey,
-                timestamp,
-                hash: 'e11a023bc0ccf713cb50de9baa5140e59d3d4c52ec8952d9ca60326e040eda54',
-            },
-            'opbUwdiS1FBsrDUoPgZdx',
-            'cuwakimacojulawu'
-        );
-        xApiKey = `${apiKey}:${apiEncryption}`;
+		timestamp = helperDateService.timestamp();
+		const apiEncryption = await authApiService.encryptApiKey(
+			{
+				key: apiKey,
+				timestamp,
+				hash: 'e11a023bc0ccf713cb50de9baa5140e59d3d4c52ec8952d9ca60326e040eda54',
+			},
+			'opbUwdiS1FBsrDUoPgZdx',
+			'cuwakimacojulawu',
+		);
+		xApiKey = `${apiKey}:${apiEncryption}`;
 
-        await app.init();
-    });
+		await app.init();
+	});
 
-    it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Error Request`, async () => {
-        const response = await request(app.getHttpServer())
-            .post(E2E_USER_PUBLIC_SIGN_UP_URL)
-            .set('Content-Type', 'application/json')
-            .set('user-agent', faker.internet.userAgent())
-            .set('x-timestamp', timestamp.toString())
-            .set('x-api-key', xApiKey)
-            .send({
-                email: faker.name.firstName().toLowerCase(),
-                firstName: faker.name.firstName().toLowerCase(),
-                lastName: faker.name.lastName().toLowerCase(),
-            });
+	it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Error Request`, async () => {
+		const response = await request(app.getHttpServer())
+			.post(E2E_USER_PUBLIC_SIGN_UP_URL)
+			.set('Content-Type', 'application/json')
+			.set('user-agent', faker.internet.userAgent())
+			.set('x-timestamp', timestamp.toString())
+			.set('x-api-key', xApiKey)
+			.send({
+				email: faker.name.firstName().toLowerCase(),
+				firstName: faker.name.firstName().toLowerCase(),
+				lastName: faker.name.lastName().toLowerCase(),
+			});
 
-        expect(response.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
-        expect(response.body.statusCode).toEqual(
-            ENUM_REQUEST_STATUS_CODE_ERROR.REQUEST_VALIDATION_ERROR
-        );
+		expect(response.status).toEqual(HttpStatus.UNPROCESSABLE_ENTITY);
+		expect(response.body.statusCode).toEqual(
+			ENUM_REQUEST_STATUS_CODE_ERROR.REQUEST_VALIDATION_ERROR,
+		);
 
-        return;
-    });
+		return;
+	});
 
-    it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Success`, async () => {
-        const response = await request(app.getHttpServer())
-            .post(E2E_USER_PUBLIC_SIGN_UP_URL)
-            .set('Content-Type', 'application/json')
-            .set('user-agent', faker.internet.userAgent())
-            .set('x-timestamp', timestamp.toString())
-            .set('x-api-key', xApiKey)
-            .send(userData);
+	it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Success`, async () => {
+		const response = await request(app.getHttpServer())
+			.post(E2E_USER_PUBLIC_SIGN_UP_URL)
+			.set('Content-Type', 'application/json')
+			.set('user-agent', faker.internet.userAgent())
+			.set('x-timestamp', timestamp.toString())
+			.set('x-api-key', xApiKey)
+			.send(userData);
 
-        expect(response.status).toEqual(HttpStatus.CREATED);
-        expect(response.body.statusCode).toEqual(HttpStatus.CREATED);
-    });
+		expect(response.status).toEqual(HttpStatus.CREATED);
+		expect(response.body.statusCode).toEqual(HttpStatus.CREATED);
+	});
 
-    it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Exist`, async () => {
-        const response = await request(app.getHttpServer())
-            .post(E2E_USER_PUBLIC_SIGN_UP_URL)
-            .set('Content-Type', 'application/json')
-            .set('user-agent', faker.internet.userAgent())
-            .set('x-timestamp', timestamp.toString())
-            .set('x-api-key', xApiKey)
-            .send(userData);
+	it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Exist`, async () => {
+		const response = await request(app.getHttpServer())
+			.post(E2E_USER_PUBLIC_SIGN_UP_URL)
+			.set('Content-Type', 'application/json')
+			.set('user-agent', faker.internet.userAgent())
+			.set('x-timestamp', timestamp.toString())
+			.set('x-api-key', xApiKey)
+			.send(userData);
 
-        expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
-        expect(response.body.statusCode).toEqual(
-            ENUM_USER_STATUS_CODE_ERROR.USER_EXISTS_ERROR
-        );
+		expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
+		expect(response.body.statusCode).toEqual(
+			ENUM_USER_STATUS_CODE_ERROR.USER_EXISTS_ERROR,
+		);
 
-        return;
-    });
+		return;
+	});
 
-    it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Email Exist`, async () => {
-        const response = await request(app.getHttpServer())
-            .post(E2E_USER_PUBLIC_SIGN_UP_URL)
-            .set('Content-Type', 'application/json')
-            .set('user-agent', faker.internet.userAgent())
-            .set('x-timestamp', timestamp.toString())
-            .set('x-api-key', xApiKey)
-            .send({
-                ...userData,
-                mobileNumber: faker.phone.number('62812#########'),
-            });
+	it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Email Exist`, async () => {
+		const response = await request(app.getHttpServer())
+			.post(E2E_USER_PUBLIC_SIGN_UP_URL)
+			.set('Content-Type', 'application/json')
+			.set('user-agent', faker.internet.userAgent())
+			.set('x-timestamp', timestamp.toString())
+			.set('x-api-key', xApiKey)
+			.send({
+				...userData,
+				mobileNumber: faker.phone.number('62812#########'),
+			});
 
-        expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
-        expect(response.body.statusCode).toEqual(
-            ENUM_USER_STATUS_CODE_ERROR.USER_EMAIL_EXIST_ERROR
-        );
+		expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
+		expect(response.body.statusCode).toEqual(
+			ENUM_USER_STATUS_CODE_ERROR.USER_EMAIL_EXIST_ERROR,
+		);
 
-        return;
-    });
+		return;
+	});
 
-    it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Mobile Number Exist`, async () => {
-        const response = await request(app.getHttpServer())
-            .post(E2E_USER_PUBLIC_SIGN_UP_URL)
-            .set('Content-Type', 'application/json')
-            .set('user-agent', faker.internet.userAgent())
-            .set('x-timestamp', timestamp.toString())
-            .set('x-api-key', xApiKey)
-            .send({
-                ...userData,
-                email: faker.internet.email(),
-            });
+	it(`POST ${E2E_USER_PUBLIC_SIGN_UP_URL} Sign Up Mobile Number Exist`, async () => {
+		const response = await request(app.getHttpServer())
+			.post(E2E_USER_PUBLIC_SIGN_UP_URL)
+			.set('Content-Type', 'application/json')
+			.set('user-agent', faker.internet.userAgent())
+			.set('x-timestamp', timestamp.toString())
+			.set('x-api-key', xApiKey)
+			.send({
+				...userData,
+				email: faker.internet.email(),
+			});
 
-        expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
-        expect(response.body.statusCode).toEqual(
-            ENUM_USER_STATUS_CODE_ERROR.USER_MOBILE_NUMBER_EXIST_ERROR
-        );
+		expect(response.status).toEqual(HttpStatus.BAD_REQUEST);
+		expect(response.body.statusCode).toEqual(
+			ENUM_USER_STATUS_CODE_ERROR.USER_MOBILE_NUMBER_EXIST_ERROR,
+		);
 
-        return;
-    });
+		return;
+	});
 
-    afterAll(async () => {
-        try {
-            await userService.deleteOne({
-                email: userData.email,
-                mobileNumber: userData.mobileNumber,
-            });
-        } catch (e) {
-            console.error(e);
-        }
+	afterAll(async () => {
+		try {
+			await userService.deleteOne({
+				email: userData.email,
+				mobileNumber: userData.mobileNumber,
+			});
+		} catch (e) {
+			console.error(e);
+		}
 
-        connection.close();
-        await app.close();
-    });
+		connection.close();
+		await app.close();
+	});
 });
