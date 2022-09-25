@@ -3,9 +3,9 @@ import { CommonModule } from 'src/common/common.module';
 import { AuthApiBulkService } from 'src/common/auth/services/auth.api.bulk.service';
 import { AuthApiService } from 'src/common/auth/services/auth.api.service';
 import {
-    AuthApiDatabaseName,
-    AuthApiEntity,
-    AuthApiSchema,
+	AuthApiDatabaseName,
+	AuthApiEntity,
+	AuthApiSchema,
 } from 'src/common/auth/schemas/auth.api.schema';
 import { faker } from '@faker-js/faker';
 import { Types } from 'mongoose';
@@ -16,75 +16,74 @@ import { AuthApiRepository } from 'src/common/auth/repositories/auth.api.reposit
 import { AuthApiBulkRepository } from 'src/common/auth/repositories/auth.api.bulk.repository';
 
 describe('AuthApiBulkService', () => {
-    let authApiBulkService: AuthApiBulkService;
-    let authApiService: AuthApiService;
+	let authApiBulkService: AuthApiBulkService;
+	let authApiService: AuthApiService;
 
-    const authApiName: string = faker.random.alphaNumeric(5);
+	const authApiName: string = faker.random.alphaNumeric(5);
 
-    let authApi: IAuthApi;
+	let authApi: IAuthApi;
 
-    beforeEach(async () => {
-        const moduleRef = await Test.createTestingModule({
-            imports: [
-                CommonModule,
-                MongooseModule.forFeature(
-                    [
-                        {
-                            name: AuthApiEntity.name,
-                            schema: AuthApiSchema,
-                            collection: AuthApiDatabaseName,
-                        },
-                    ],
-                    DATABASE_CONNECTION_NAME
-                ),
-            ],
-            providers: [
-                AuthApiBulkService,
-                AuthApiService,
-                AuthApiRepository,
-                AuthApiBulkRepository,
-            ],
-        }).compile();
+	beforeEach(async () => {
+		const moduleRef = await Test.createTestingModule({
+			imports: [
+				CommonModule,
+				MongooseModule.forFeature(
+					[
+						{
+							name: AuthApiEntity.name,
+							schema: AuthApiSchema,
+							collection: AuthApiDatabaseName,
+						},
+					],
+					DATABASE_CONNECTION_NAME,
+				),
+			],
+			providers: [
+				AuthApiBulkService,
+				AuthApiService,
+				AuthApiRepository,
+				AuthApiBulkRepository,
+			],
+		}).compile();
 
-        authApiBulkService =
-            moduleRef.get<AuthApiBulkService>(AuthApiBulkService);
-        authApiService = moduleRef.get<AuthApiService>(AuthApiService);
+		authApiBulkService = moduleRef.get<AuthApiBulkService>(AuthApiBulkService);
+		authApiService = moduleRef.get<AuthApiService>(AuthApiService);
 
-        authApi = await authApiService.create({
-            name: authApiName,
-            description: faker.random.alphaNumeric(),
-        });
-    });
+		authApi = await authApiService.create({
+			name: authApiName,
+			description: faker.random.alphaNumeric(),
+		});
+	});
 
-    it('should be defined', async () => {
-        expect(authApiBulkService).toBeDefined();
-    });
+	it('should be defined', async () => {
+		expect(authApiBulkService).toBeDefined();
+	});
 
-    describe('deleteMany', () => {
-        it('should return an success', async () => {
-            const result = true;
-            jest.spyOn(authApiBulkService, 'deleteMany').mockImplementation(
-                async () => result
-            );
+	describe('deleteMany', () => {
+		it('should return an success', async () => {
+			const result = true;
+			jest
+				.spyOn(authApiBulkService, 'deleteMany')
+				.mockImplementation(async () => result);
 
-            expect(
-                await authApiBulkService.deleteMany({
-                    _id: new Types.ObjectId(authApi._id),
-                })
-            ).toBe(result);
-        });
-    });
+			expect(
+				await authApiBulkService.deleteMany({
+					_id: new Types.ObjectId(authApi._id),
+				}),
+			).toBe(result);
+		});
+	});
 
-    afterEach(async () => {
-        try {
-            await authApiBulkService.deleteMany({
-                _id: new Types.ObjectId(authApi._id),
-            });
-            await authApiService.deleteOne({
-                name: authApiName,
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    });
+	afterEach(async () => {
+		try {
+			await authApiBulkService.deleteMany({
+				_id: new Types.ObjectId(authApi._id),
+			});
+			await authApiService.deleteOne({
+				name: authApiName,
+			});
+		} catch (e) {
+			console.error(e);
+		}
+	});
 });

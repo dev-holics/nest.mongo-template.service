@@ -1,20 +1,42 @@
 version: '3.8'
 services:
-  mongo-db:
+  mongodb:
     image: mongo:latest
     container_name: 'mongo'
-    command: [--auth]
+    command: [ --auth ]
     environment:
       - MONGO_INITDB_ROOT_USERNAME=ductruong
       - MONGO_INITDB_ROOT_PASSWORD=ductruong
-      - MONGO_INITDB_DATABASE=demodb
+      - MONGO_INITDB_DATABASE=happy-care
     volumes:
       - dbdata:/data/db
     ports:
-      - 27017:27017
+      - "27017:27017"
     restart: unless-stopped
     networks:
       - app-network
+  service:
+    build: .
+    container_name: happy-care_auth_server
+    hostname: happy-care
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    env_file:
+      - .docker.env
+    environment:
+      - DATABASE_HOST=mongodb://localhost:27017
+      - DATABASE_NAME=happy-care-auth
+      - DATABASE_USER=ductruong
+      - DATABASE_PASSWORD=ductruong
+      - DATABASE_DEBUG=false
+      - DATABASE_OPTIONS=''
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
 networks:
   app-network:
     name: app-network
